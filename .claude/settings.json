@@ -35,5 +35,5 @@
       "Bash(make lint)",
       "Bash(git commit *)"
     ]
-  },
+  }
 }
