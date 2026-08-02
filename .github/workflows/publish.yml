@@ -1,0 +1,83 @@
+name: Publish Python client
+
+# Publishes ayvee-runner-client to PyPI when a GitHub release is published,
+# or to TestPyPI on demand. Uses PyPI Trusted Publishing (OIDC) — there is no
+# API token stored in the repo.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Index to publish to
+        type: choice
+        options: [testpypi, pypi]
+        default: testpypi
+
+defaults:
+  run:
+    working-directory: python
+
+jobs:
+  build:
+    name: Build and check the distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify the package version matches the release tag
+        if: github.event_name == 'release'
+        run: |
+          version=$(python -c 'import tomllib,pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')
+          tag="${GITHUB_REF_NAME#v}"
+          echo "pyproject version: $version"
+          echo "release tag:       $tag"
+          if [ "$version" != "$tag" ]; then
+            echo "::error::pyproject version ($version) does not match the release tag ($tag). Bump the version before releasing."
+            exit 1
+          fi
+
+      # Never ship a build that can't pass its own checks.
+      - run: uv sync
+      - run: uv run ruff check .
+      - run: uv run pytest tests/unit -q
+
+      - name: Build sdist and wheel
+        run: uv build
+
+      - name: Check the metadata renders on PyPI
+        run: uvx twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: python/dist/
+
+  publish:
+    name: Publish to ${{ github.event_name == 'release' && 'PyPI' || inputs.target }}
+    needs: build
+    runs-on: ubuntu-latest
+    # The environment gates the release and holds the Trusted Publishing link.
+    environment:
+      name: ${{ github.event_name == 'release' && 'pypi' || inputs.target }}
+      url: https://pypi.org/p/ayvee-runner-client
+    permissions:
+      id-token: write # required for Trusted Publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to TestPyPI
+        if: github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+      - name: Publish to PyPI
+        if: github.event_name == 'release' || inputs.target == 'pypi'
+        uses: pypa/gh-action-pypi-publish@release/v1

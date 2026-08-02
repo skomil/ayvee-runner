@@ -436,8 +436,35 @@ uv run pytest
 
 ## Publishing the client to PyPI
 
+Releases are automated. `.github/workflows/publish.yml` builds the sdist and wheel, checks
+that `pyproject.toml`'s version matches the release tag, gates on ruff and the unit tests,
+verifies the metadata with `twine check`, and uploads using **PyPI Trusted Publishing** — so
+no API token is stored in the repo.
+
+**One-time setup.** On PyPI, add a trusted publisher for the project
+(*Manage project → Publishing*) pointing at this repository, workflow `publish.yml`, and
+environment `pypi`; repeat on TestPyPI with environment `testpypi` if you want the dry-run
+path. Create the matching GitHub environments under *Settings → Environments* (add required
+reviewers there if you want a manual approval gate on releases).
+
+**Cutting a release.**
+
+```sh
+# 1. bump the version in python/pyproject.toml, commit
+# 2. tag and push
+git tag v0.2.0 && git push origin v0.2.0
+# 3. publish a GitHub release for that tag — the workflow uploads to PyPI
+```
+
+The tag/version check fails the run rather than publishing a mismatched artifact. To rehearse
+against TestPyPI, run the workflow manually (*Actions → Publish Python client → Run
+workflow*) with the `testpypi` target.
+
+**Manual release** (token-based, for when you'd rather not go through CI):
+
 ```sh
 cd python
-uv build
-uv publish       # needs a PyPI token
+./scripts/publish.sh            # dry run: lint, test, build, twine check
+./scripts/publish.sh testpypi   # upload to TestPyPI
+UV_PUBLISH_TOKEN=pypi-… ./scripts/publish.sh pypi
 ```
