@@ -4,20 +4,24 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ayvee-runner</title>
+  <!-- Relative so the dashboard works under a reverse-proxy path prefix. -->
+  <link rel="stylesheet" href="ds/styles.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>ayvee-runner</h1>
+    <h1>ayvee<span class="sep">-</span>runner</h1>
     <span id="runner-name" class="runner-name"></span>
     <span id="health" class="health">connecting…</span>
   </header>
 
   <section>
     <h2>Claude usage</h2>
-    <p id="limit-headline" class="limit-headline" hidden></p>
+    <div class="readout">
+      <p id="limit-headline" class="limit-headline" hidden></p>
+      <p class="hint" id="limit-line">No usage recorded yet.</p>
+    </div>
     <div id="limit-meter" class="meter" hidden><div id="limit-bar" class="bar"></div></div>
-    <p class="hint" id="limit-line">No usage recorded yet.</p>
     <div id="claude-limits" hidden>
       <div id="limits-list"></div>
       <p class="hint" id="limits-note"></p>
@@ -63,7 +67,8 @@
 
   <section id="profiles-section" hidden>
     <h2>Launch profiles</h2>
-    <p class="hint">The local allowlist from <code>profiles.json</code>. Only these can be launched.</p>
+    <p class="hint">Conversations use the built-in profile. Your own entries come from
+      <code>profiles.json</code> — only these can be launched.</p>
     <p class="hint">
       <label>Model for new sessions (optional, e.g. <code>sonnet</code>):
         <input id="model-input" type="text" placeholder="default" class="model-input" />

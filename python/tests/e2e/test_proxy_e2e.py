@@ -70,7 +70,7 @@ class TestProxyPathPrefix:
     ) -> None:
         page = httpx.get(proxy)
         assert page.status_code == 200
-        assert "<h1>ayvee-runner</h1>" in page.text
+        assert "ayvee" in page.text and "runner" in page.text
 
         refs = re.findall(r'(?:href|src)="([^"]+)"', page.text)
         assert refs, "dashboard referenced no assets"
@@ -79,6 +79,20 @@ class TestProxyPathPrefix:
             assert not ref.startswith("/"), f"absolute asset path: {ref}"
             asset = httpx.get(urljoin(proxy, ref))
             assert asset.status_code == 200, ref
+
+    def test_design_system_tokens_and_fonts_resolve_through_the_prefix(self, proxy: str) -> None:
+        """The stylesheet chains @import -> tokens -> ../assets/fonts, all
+        relative; a broken link there would render an unstyled page."""
+        entry = httpx.get(urljoin(proxy, "ds/styles.css"))
+        assert entry.status_code == 200
+        imports = re.findall(r'@import url\("([^"]+)"\)', entry.text)
+        assert imports, "design system entry imported nothing"
+        for ref in imports:
+            token_url = urljoin(urljoin(proxy, "ds/"), ref)
+            token = httpx.get(token_url)
+            assert token.status_code == 200, ref
+            for font in re.findall(r"url\('([^']+\.woff2)'\)", token.text):
+                assert httpx.get(urljoin(token_url, font)).status_code == 200, font
 
     def test_bundle_uses_a_relative_api_base(self, proxy: str) -> None:
         bundle = httpx.get(urljoin(proxy, "dashboard.js"))

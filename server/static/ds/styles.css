@@ -1,0 +1,11 @@
+/* Ayvee Console — global stylesheet entry point.
+   A higher-contrast, larger-type revision of the ayvee hi-fi/AV design system.
+   Import list only; every token/font file this reaches is what ships. */
+
+@import url("./tokens/fonts.css");
+@import url("./tokens/colors.css");
+@import url("./tokens/typography.css");
+@import url("./tokens/spacing.css");
+@import url("./tokens/shadows.css");
+@import url("./tokens/motion.css");
+@import url("./tokens/base.css");

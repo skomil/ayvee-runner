@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Ayvee Console — Radius, border & shadow/bevel tokens.
+   Skeuomorphism target: moderate-high — tactile bevels + inset/outset depth,
+   short of full photoreal chrome.
+   ========================================================================== */
+
+:root {
+  /* ---- corner radii ---- */
+  --radius-xs:   3px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 999px;
+
+  /* ---- border widths ---- */
+  --border-thin:  1px;
+  --border-thick: 2px;
+
+  /* ---- elevation: soft ambient shadows for panels/cards ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.35);
+
+  /* ---- bevel: raised control (button/knob cap at rest) ---- */
+  --shadow-raised:
+    inset 0 1px 0 rgba(255, 255, 255, 0.13),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.55),
+    0 1px 1px rgba(0, 0, 0, 0.4),
+    0 2px 5px rgba(0, 0, 0, 0.4);
+
+  /* ---- bevel: pressed / active control ---- */
+  --shadow-pressed:
+    inset 0 2px 5px rgba(0, 0, 0, 0.65),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+
+  /* ---- bevel: inset well (jack sockets, LCD windows, meter recesses) ---- */
+  --shadow-inset:
+    inset 0 2px 6px rgba(0, 0, 0, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+
+  /* ---- glow: signal LEDs — soft halo, not a hard drop-shadow ---- */
+  --glow-amber: 0 0 6px rgba(230, 152, 117, 0.7), 0 0 14px rgba(230, 152, 117, 0.35);
+  --glow-green: 0 0 6px rgba(167, 192, 128, 0.72), 0 0 14px rgba(167, 192, 128, 0.36);
+  --glow-red:   0 0 6px rgba(230, 126, 128, 0.72), 0 0 14px rgba(230, 126, 128, 0.36);
+  --glow-blue:  0 0 6px rgba(127, 187, 179, 0.75), 0 0 15px rgba(127, 187, 179, 0.38);
+  --glow-accent: var(--glow-blue);
+
+  /* ---- focus ring ---- */
+  --focus-ring: 0 0 0 3px color-mix(in oklch, var(--signal-blue-500) 50%, transparent);
+}
+
+[data-theme="showroom"] {
+  --shadow-sm: 0 1px 2px rgba(33, 27, 20, 0.10);
+  --shadow-md: 0 4px 10px rgba(33, 27, 20, 0.12), 0 1px 2px rgba(33, 27, 20, 0.08);
+  --shadow-lg: 0 12px 28px rgba(33, 27, 20, 0.16), 0 2px 6px rgba(33, 27, 20, 0.08);
+
+  --shadow-raised:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -2px 3px rgba(33, 27, 20, 0.18),
+    0 1px 1px rgba(33, 27, 20, 0.12),
+    0 2px 4px rgba(33, 27, 20, 0.10);
+
+  --shadow-pressed:
+    inset 0 2px 4px rgba(33, 27, 20, 0.35),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+
+  --shadow-inset:
+    inset 0 2px 5px rgba(19, 17, 16, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}

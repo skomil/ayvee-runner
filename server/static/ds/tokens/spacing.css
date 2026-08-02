@@ -1,0 +1,26 @@
+/* ==========================================================================
+   Ayvee Console — Spacing tokens. 4px base grid.
+   ========================================================================== */
+
+:root {
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* panel padding presets — hifi faceplates keep generous margins to the bezel */
+  --panel-padding-sm: var(--space-4);
+  --panel-padding-md: var(--space-6);
+  --panel-padding-lg: var(--space-8);
+
+  --control-gap-sm: var(--space-2);
+  --control-gap-md: var(--space-4);
+}

@@ -1,0 +1,56 @@
+/* ==========================================================================
+   Ayvee Console — Typography tokens  (larger, more legible revision)
+   Display: Big Shoulders Display — faceplate labels ONLY, kept short.
+   Body/UI + NAV + section labels: Public Sans — the readability workhorse.
+   Data/Code + tag micro-labels: JetBrains Mono.
+   LED/LCD readouts only: Share Tech Mono.
+   Revision note: nav and left-menu section heads use --font-body (not the
+   condensed display face) so long labels stay readable; display type is
+   reserved for true faceplate moments (wordmark, big section titles).
+   ========================================================================== */
+
+:root {
+  --font-display: "Big Shoulders Display", "Oswald", sans-serif;
+  --font-body:    "Public Sans", -apple-system, "Segoe UI", sans-serif;
+  --font-mono:    "JetBrains Mono", "SFMono-Regular", monospace;
+  --font-led:     "Share Tech Mono", "JetBrains Mono", monospace;
+  /* nav / section-label face — explicitly the readable body sans */
+  --font-nav:     var(--font-body);
+
+  /* ---- weights ---- */
+  --weight-display-regular: 500;
+  --weight-display-bold:    700;
+  --weight-display-black:   800;
+  --weight-body-regular:    400;
+  --weight-body-medium:     500;
+  --weight-body-semibold:   600;
+  --weight-body-bold:       700;
+
+  /* ---- display / faceplate label scale ---- */
+  --text-display-xl:   clamp(3rem, 5vw, 4.75rem);
+  --text-display-lg:   2.75rem;
+  --text-display-md:   1.9rem;
+  --text-display-sm:   1.35rem;
+  --text-label-tiny:   0.75rem;
+
+  --tracking-label:    0.08em;
+  --tracking-label-lg: 0.14em;
+
+  /* ---- body scale (bumped one notch for legibility) ---- */
+  --text-body-lg:   1.1875rem;   /* 19px */
+  --text-body-md:   1.0625rem;   /* 17px */
+  --text-body-sm:   0.9375rem;   /* 15px */
+  --text-body-xs:   0.8125rem;   /* 13px */
+
+  --leading-tight:  1.1;
+  --leading-snug:   1.3;
+  --leading-normal: 1.55;
+  --leading-loose:  1.7;
+
+  /* ---- mono / led ---- */
+  --text-mono-md:  0.9375rem;
+  --text-mono-sm:  0.8125rem;
+  --text-led-md:   1.5rem;
+  --text-led-lg:   2.25rem;
+  --tracking-led:  0.06em;
+}

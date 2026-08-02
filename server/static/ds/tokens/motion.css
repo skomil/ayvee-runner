@@ -1,0 +1,16 @@
+/* ==========================================================================
+   Ayvee Console — Motion tokens.
+   Controls feel mechanical: quick snappy settle on press (like a real switch),
+   slightly slower eases on panels/overlays. No bounce, no springs.
+   ========================================================================== */
+
+:root {
+  --dur-instant: 80ms;  /* @kind other */
+  --dur-fast:    140ms; /* @kind other */
+  --dur-base:    220ms; /* @kind other */
+  --dur-slow:    360ms; /* @kind other */
+
+  --ease-tactile:  cubic-bezier(0.2, 0.8, 0.2, 1); /* @kind other */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);   /* @kind other */
+  --ease-out:      cubic-bezier(0, 0, 0.2, 1);      /* @kind other */
+}

@@ -1,0 +1,130 @@
+/* ==========================================================================
+   Ayvee Console — Color tokens  (high-contrast revision of ayvee)
+   Same Everforest / code-editor signal language, but the dark "Rack" finish
+   is pushed for legibility: brighter ink, a darker canvas, and wider steps
+   between panel / raised / inset surfaces so wells and cards separate cleanly.
+   Base (raw) values first; semantic aliases below reference them.
+   ========================================================================== */
+
+:root {
+  /* ---- raw: paper / warm neutrals (Showroom) ---- */
+  --paper-0:   #FDFAF3;
+  --paper-50:  #FAF5EA;
+  --paper-100: #F3EAD8;
+  --paper-200: #E9DCC1;
+  --paper-300: #DCCBA6;
+
+  /* ---- raw: wood & brass ---- */
+  --wood-300:  #C9A876;
+  --wood-500:  #A97C46;
+  --wood-700:  #7A5730;
+  --brass-300: #E0C687;
+  --brass-500: #BE9A52;
+
+  /* ---- raw: ink (text on light) ---- */
+  --ink-900: #211B14;
+  --ink-700: #453B2E;
+  --ink-500: #6B5F4E;
+
+  /* ---- raw: chassis (Rack) — darker, wider-stepped editor ramp ---- */
+  --charcoal-980: #0C1114;  /* deepest well / inset */
+  --charcoal-950: #12171A;  /* canvas */
+  --charcoal-900: #212A2F;  /* panel */
+  --charcoal-800: #2E383E;  /* raised */
+  --charcoal-700: #3A464D;
+  --charcoal-600: #46525A;
+
+  /* ---- raw: aluminum → brighter warm-neutral ink on the editor ground ---- */
+  --aluminum-50:  #EFF2EB;  /* NEW brightest — primary text */
+  --aluminum-100: #C4CEC2;  /* secondary text */
+  --aluminum-300: #93A093;  /* tertiary text */
+  --aluminum-500: #6E7A70;  /* faint / disabled */
+
+  /* ---- raw: signal lights — subdued Everforest accents ---- */
+  --signal-amber-300: #ECC08A;
+  --signal-amber-500: #E69875;
+  --signal-amber-700: #B36E4F;
+
+  --signal-green-300: #C6D9A6;
+  --signal-green-500: #A7C080;
+  --signal-green-700: #718A54;
+
+  --signal-red-300:   #EFA6A2;
+  --signal-red-500:   #E67E80;
+  --signal-red-700:   #B65456;
+
+  --signal-blue-300:  #A6D0CA;
+  --signal-blue-500:  #7FBBB3;
+  --signal-blue-700:  #4E8A82;
+
+  /* ---- semantic: surfaces — Rack (dark) is the primary/default finish ---- */
+  --bg-canvas:        var(--charcoal-950);
+  --surface-panel:    var(--charcoal-900);
+  --surface-raised:   var(--charcoal-800);
+  --surface-inset:    var(--charcoal-980);
+  --surface-overlay:  color-mix(in oklch, black 55%, transparent);
+  --surface-control:  #46525A;
+  --surface-control-hi: #5C6A72;
+
+  /* ---- semantic: text (brighter than base ayvee) ---- */
+  --text-primary:     var(--aluminum-50);
+  --text-secondary:   var(--aluminum-100);
+  --text-tertiary:    var(--aluminum-300);
+  --text-on-accent:   #10201C;
+  --text-on-dark:     var(--aluminum-50);
+
+  /* ---- semantic: borders / hairlines (a touch stronger for separation) ---- */
+  --border-hairline:  color-mix(in oklch, var(--aluminum-300) 42%, transparent);
+  --border-strong:    var(--aluminum-300);
+  --border-focus:     var(--signal-blue-500);
+  --border-control:   color-mix(in oklch, var(--aluminum-100) 55%, transparent);
+
+  /* ---- semantic: accent / signal ----
+     Action/control accent is BLUE. Green/amber/red are DISPLAY signals
+     (LEDs, meters, status, tag dots) — keeping them separate is what tells a
+     control apart from an indicator. */
+  --accent:           var(--signal-blue-500);
+  --accent-strong:    var(--signal-blue-700);
+  --accent-soft:      var(--signal-blue-300);
+  --accent-contrast:  var(--text-on-accent);
+
+  --status-active:    var(--signal-green-500);
+  --status-alert:     var(--signal-red-500);
+  --status-info:      var(--signal-blue-500);
+  --status-idle:      var(--aluminum-300);
+
+  /* ---- semantic: material accents ---- */
+  --material-wood:    var(--wood-700);
+  --material-brass:   var(--brass-500);
+  --material-metal:   var(--aluminum-300);
+
+  /* ---- tag system ---- (see components/feedback/Tag)
+     Tags are keyed to any color; the shell is a mix over the inset well. */
+  --tag-fill-mix:     24%;   /* selected fill: color over --surface-inset */
+  --tag-fill-mix-dim: 9%;    /* unselected (dim) fill */
+  --tag-fill-mix-not: 32%;   /* NOT fill, mixed over near-black */
+}
+
+/* ==========================================================================
+   Showroom mode — light chassis, for daylight/print/marketing.
+   ========================================================================== */
+[data-theme="showroom"] {
+  --bg-canvas:        var(--paper-50);
+  --surface-panel:    var(--paper-100);
+  --surface-raised:   var(--paper-0);
+  --surface-inset:    var(--paper-200);
+  --surface-overlay:  color-mix(in oklch, var(--ink-900) 45%, transparent);
+  --surface-control:  #DCE2E8;
+  --surface-control-hi: #EEF1F4;
+
+  --text-primary:     var(--ink-900);
+  --text-secondary:   var(--ink-700);
+  --text-tertiary:    var(--ink-500);
+
+  --border-hairline:  color-mix(in oklch, var(--wood-500) 45%, transparent);
+  --border-strong:    var(--wood-500);
+  --border-control:   color-mix(in oklch, var(--wood-500) 60%, transparent);
+
+  --material-wood:    var(--wood-500);
+  --material-metal:   var(--aluminum-300);
+}

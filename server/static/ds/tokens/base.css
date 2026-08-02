@@ -1,0 +1,38 @@
+/* ==========================================================================
+   Ayvee Console — base element resets. Minimal; components style themselves.
+   Revision: headings default to the readable body font and are NOT forced to
+   uppercase. The condensed display face + caps is opt-in (add the .faceplate
+   class or set font-family:var(--font-display)) so in-content titles keep the
+   same hierarchy as the rest of the UI instead of shouting.
+   ========================================================================== */
+
+body {
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-body);
+  font-weight: var(--weight-body-bold);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* opt-in faceplate lettering — the engraved-equipment look */
+.faceplate {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display-bold);
+  letter-spacing: var(--tracking-label-lg);
+  text-transform: uppercase;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-soft); }
+
+code, kbd, samp, pre { font-family: var(--font-mono); }
+
+* { box-sizing: border-box; }

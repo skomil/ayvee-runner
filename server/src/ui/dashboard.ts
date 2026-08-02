@@ -92,6 +92,14 @@ function cell(row: HTMLTableRowElement, ...children: (string | HTMLElement)[]): 
   return td;
 }
 
+/** Row controls sit together as one right-aligned cluster. */
+function actionGroup(buttons: HTMLElement[]): HTMLElement {
+  const group = document.createElement('div');
+  group.className = 'actions';
+  group.append(...buttons);
+  return group;
+}
+
 function actionButton(label: string, danger: boolean, onClick: () => void): HTMLButtonElement {
   const btn = document.createElement('button');
   btn.textContent = label;
@@ -150,7 +158,7 @@ async function refreshProfiles(): Promise<void> {
     if (p.kind === 'tmux') {
       buttons.push(actionButton('Launch remote control', false, launch(true)));
     }
-    cell(row, ...buttons);
+    cell(row, actionGroup(buttons));
     tbody.appendChild(row);
   }
 }
@@ -184,7 +192,7 @@ async function refreshSessions(): Promise<void> {
     if (s.kind === 'headless') {
       actions.unshift(actionButton('Inspect', false, () => inspect(s)));
     }
-    cell(row, ...actions);
+    cell(row, actionGroup(actions));
     tbody.appendChild(row);
   }
 }
@@ -263,6 +271,16 @@ interface ClaudeLimits {
   periods: UsagePeriod[];
 }
 
+/** The LED readout: a lit figure with a small engraved unit beside it. */
+function setReadout(el: HTMLElement, figure: string, unit: string): void {
+  clearChildren(el);
+  el.append(figure, ' ');
+  const suffix = document.createElement('span');
+  suffix.className = 'unit';
+  suffix.textContent = unit;
+  el.appendChild(suffix);
+}
+
 function barFor(usedPercent: number): HTMLElement {
   const meter = document.createElement('div');
   meter.className = 'meter';
@@ -285,7 +303,7 @@ function renderClaudeLimits(limits: ClaudeLimits | null): boolean {
 
   const session = limits.limits.find((l) => l.scope === 'session') ?? limits.limits[0]!;
   const headline = $('#limit-headline');
-  headline.textContent = `${session.remainingPercent}% left`;
+  setReadout(headline, `${session.remainingPercent}%`, 'left');
   headline.hidden = false;
   $('#limit-line').textContent =
     `${session.label}: ${session.usedPercent}% used · resets ${session.resetsAt}`;
@@ -342,10 +360,10 @@ function renderContributors(periods: UsagePeriod[]): void {
       const label = document.createElement('span');
       label.className = 'period-key';
       label.textContent = `Top ${breakdown.category}: `;
-      line.append(
-        label,
-        breakdown.entries.map((e) => `${e.name} ${e.percent}%`).join(', '),
-      );
+      const value = document.createElement('span');
+      value.className = 'value';
+      value.textContent = breakdown.entries.map((e) => `${e.name} ${e.percent}%`).join(', ');
+      line.append(label, value);
       block.appendChild(line);
     }
     list.appendChild(block);
@@ -368,7 +386,7 @@ async function refreshMetrics(): Promise<void> {
   const bar = $('#limit-bar');
 
   if (tokens !== null && remainingPercent !== null && remainingTokens !== null) {
-    headline.textContent = `${remainingPercent}% left`;
+    setReadout(headline, `${remainingPercent}%`, 'left');
     headline.hidden = false;
     limitLine.textContent =
       `${remainingTokens.toLocaleString()} of ${tokens.toLocaleString()} tokens left in the ` +
