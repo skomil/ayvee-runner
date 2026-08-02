@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ayvee-runner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>ayvee-runner</h1>
+    <span id="runner-name" class="runner-name"></span>
+    <span id="health" class="health">connecting…</span>
+  </header>
+
+  <section>
+    <h2>Claude usage</h2>
+    <p id="limit-headline" class="limit-headline" hidden></p>
+    <div id="limit-meter" class="meter" hidden><div id="limit-bar" class="bar"></div></div>
+    <p class="hint" id="limit-line">No usage recorded yet.</p>
+    <div id="claude-limits" hidden>
+      <div id="limits-list"></div>
+      <p class="hint" id="limits-note"></p>
+      <div id="contributors" hidden>
+        <h3 class="subhead">What's contributing to your limits usage</h3>
+        <div id="contributors-list"></div>
+      </div>
+    </div>
+    <h3 class="subhead">Tokens metered by this runner</h3>
+    <table id="metrics">
+      <thead><tr><th>Token class</th><th>5-hour window</th><th>Lifetime</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Register with Ayvee</h2>
+    <p class="hint">Give this URL to your Ayvee server — it <code>POST</code>s
+      <code>{"ayveeUrl": "…"}</code> with the API key to register. Runner id
+      <code id="runner-id">—</code>.</p>
+    <div class="copy-row">
+      <input id="register-url" type="text" readonly />
+      <button type="button" id="copy-register">Copy</button>
+    </div>
+    <table id="registrations" hidden>
+      <thead><tr><th>Ayvee server</th><th>Label</th><th>Registered</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section id="key-section">
+    <h2>API key</h2>
+    <p class="hint">Status above is public; managing sessions needs the key from
+      <code>ayvee-runner mint-key</code>. It is kept in this browser only.</p>
+    <form id="key-form">
+      <input id="key-input" type="password" placeholder="ayr_…" autocomplete="off" />
+      <button type="submit">Save</button>
+      <button type="button" id="key-clear">Clear</button>
+    </form>
+    <p class="hint" id="managed-hint" hidden>Enter the API key to see launch profiles and manage sessions.</p>
+  </section>
+
+  <section id="profiles-section" hidden>
+    <h2>Launch profiles</h2>
+    <p class="hint">The local allowlist from <code>profiles.json</code>. Only these can be launched.</p>
+    <p class="hint">
+      <label>Model for new sessions (optional, e.g. <code>sonnet</code>):
+        <input id="model-input" type="text" placeholder="default" class="model-input" />
+      </label>
+    </p>
+    <table id="profiles">
+      <thead><tr><th>Label</th><th>Kind</th><th>Directory</th><th>Command</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section id="sessions-section" hidden>
+    <h2>Active sessions</h2>
+    <table id="sessions">
+      <thead><tr><th>Name</th><th>Kind</th><th>Status</th><th>Started</th><th>Attach / exit</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section id="inspect-section" hidden>
+    <h2>Session <span id="inspect-name"></span></h2>
+    <form id="input-form">
+      <input id="input-message" type="text" placeholder="Send a message to this headless session…" autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+    <pre id="events"></pre>
+  </section>
+
+  <div id="error" class="error" hidden></div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

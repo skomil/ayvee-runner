@@ -1,0 +1,35 @@
+{
+  "name": "ayvee-runner",
+  "version": "0.1.0",
+  "description": "Ayvee remote session runner — spawns, lists, and kills tmux and headless Claude Code sessions on the user's own machine.",
+  "type": "module",
+  "bin": {
+    "ayvee-runner": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && npm run build:ui",
+    "build:ui": "esbuild src/ui/dashboard.ts --bundle --outfile=dist/public/dashboard.js && node scripts/copy-static.mjs",
+    "dev": "tsx src/cli.ts serve",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "express": "^5.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.0",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.0",
+    "@types/supertest": "^6.0.3",
+    "esbuild": "^0.25.5",
+    "eslint": "^9.30.0",
+    "supertest": "^7.1.1",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.0",
+    "vitest": "^3.2.0"
+  }
+}

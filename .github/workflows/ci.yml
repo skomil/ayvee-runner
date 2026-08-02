@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  server:
+    name: Server (lint, typecheck, unit tests, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  python:
+    name: Python client (lint, unit tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync
+      - run: uv run ruff check .
+      - run: uv run pytest tests/unit -v
+
+  e2e:
+    name: E2E + PRD smoke test (server on localhost via the library)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+      - name: Install tmux
+        run: sudo apt-get update && sudo apt-get install -y tmux
+      - name: Build the server
+        working-directory: server
+        run: npm ci && npm run build
+      - name: Install the client library
+        working-directory: python
+        run: uv sync
+      - name: PRD smoke test — one test covering every major function
+        working-directory: python
+        run: uv run pytest tests/e2e/test_smoke.py -v
+      - name: Full E2E suite
+        working-directory: python
+        run: uv run pytest tests/e2e -v --deselect tests/e2e/test_smoke.py
