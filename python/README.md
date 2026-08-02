@@ -1,6 +1,6 @@
 # ayvee-runner-client
 
-Python client for the [ayvee-runner](https://github.com/ayvee/ayvee-runner) service — the
+Python client for the [ayvee-runner](https://github.com/skomil/ayvee-runner) service — the
 per-user runner that spawns, lists, and kills tmux and headless Claude Code sessions on your
 own machine.
 
