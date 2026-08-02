@@ -205,7 +205,10 @@ interface Registration {
 
 async function refreshRegistration(): Promise<void> {
   const descriptor = await api<RunnerDescriptor>('/registration');
-  ($('#register-url') as HTMLInputElement).value = descriptor.registerUrl;
+  // Build the register URL from the address this page is served on, prefix
+  // and all. The browser knows the real externally-visible URL even when a
+  // proxy forwards no headers, so this is always reachable as displayed.
+  ($('#register-url') as HTMLInputElement).value = new URL('api/register', API_BASE).toString();
   $('#runner-id').textContent = descriptor.runnerId;
 }
 

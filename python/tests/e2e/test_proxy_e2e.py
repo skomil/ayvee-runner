@@ -86,6 +86,22 @@ class TestProxyPathPrefix:
         assert "document.baseURI" in bundle.text
         assert '"/api' not in bundle.text and "`/api" not in bundle.text
 
+    def test_copyable_register_url_is_built_from_the_page_address(self, proxy: str) -> None:
+        """The advertised register URL shown on the dashboard must come from
+        the page's own address, so it carries the proxy prefix even when the
+        proxy forwards no headers (as this test's proxy doesn't)."""
+        bundle = httpx.get(urljoin(proxy, "dashboard.js")).text
+        assert 'new URL("api/register", API_BASE)' in bundle
+        # It must not fall back to whatever the server derived for itself.
+        assert "descriptor.registerUrl" not in bundle
+
+        # The server, lacking forwarding headers, advertises the bare origin —
+        # which is exactly why the page derives its own.
+        served = httpx.get(urljoin(proxy, "api/registration")).json()["registerUrl"]
+        page_derived = urljoin(proxy, "api/register")
+        assert served != page_derived
+        assert page_derived.endswith("/runners/vm/api/register")
+
     def test_status_api_is_reachable_anonymously_through_the_prefix(self, proxy: str) -> None:
         health = httpx.get(urljoin(proxy, "api/health"))
         assert health.status_code == 200
