@@ -4,7 +4,6 @@ import express, { type Express, type NextFunction, type Request, type Response }
 import { requireApiKey } from './auth.js';
 import type { ClaudeUsageProvider } from './claudeUsage.js';
 import {
-  loadProfiles,
   ProfilesError,
   readApiKey,
   readPublicUrl,
@@ -12,6 +11,7 @@ import {
   readRunnerName,
   readTokenLimit,
 } from './config.js';
+import { allProfiles } from './profiles.js';
 import {
   addRegistration,
   loadRegistrations,
@@ -138,7 +138,7 @@ export function createApp(opts: AppOptions): Express {
   });
 
   api.get('/profiles', (_req, res) => {
-    res.json({ profiles: loadProfiles(home) });
+    res.json({ profiles: allProfiles(home) });
   });
 
   api.get('/sessions', async (_req, res) => {
@@ -168,7 +168,7 @@ export function createApp(opts: AppOptions): Express {
       res.status(400).json({ error: 'model must be a non-empty string' });
       return;
     }
-    const profile = loadProfiles(home).find((p) => p.id === profileId);
+    const profile = allProfiles(home).find((p) => p.id === profileId);
     if (!profile) {
       res.status(400).json({ error: `unknown profile id "${profileId}"` });
       return;

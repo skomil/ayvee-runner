@@ -89,7 +89,7 @@ describe('MCP server', () => {
     const health = await toolJson('health');
     expect(health.status).toBe('ok');
     const { profiles } = await toolJson('list_profiles');
-    expect(profiles.map((p: { id: string }) => p.id)).toEqual(['agent']);
+    expect(profiles.map((p: { id: string }) => p.id)).toEqual(['conversation', 'agent']);
   });
 
   it('drives a full session lifecycle: create, input, events, metrics, kill', async () => {

@@ -89,7 +89,10 @@ class TestAuth:
 class TestProfiles:
     def test_allowlist_is_returned_verbatim(self, client: RunnerClient) -> None:
         profiles = {p.id: p for p in client.list_profiles()}
+        # The built-in conversation profile is always present, alongside the
+        # machine's own profiles.json entries.
         assert set(profiles) == {
+            "conversation",
             "dev-shell",
             "echo",
             "fake-claude",
@@ -97,6 +100,7 @@ class TestProfiles:
             "claude",
             "print-model",
         }
+        assert profiles["conversation"].kind == "headless"
         assert profiles["dev-shell"].kind == "tmux"
         assert profiles["dev-shell"].command == "bash"
         assert profiles["echo"].kind == "headless"

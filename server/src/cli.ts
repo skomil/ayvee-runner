@@ -18,6 +18,7 @@ import {
   setTokenLimit,
 } from './config.js';
 import { createMcpServer } from './mcp.js';
+import { addCodeProfile, allProfiles, removeProfile } from './profiles.js';
 import { SessionRegistry } from './sessions/registry.js';
 
 const USAGE = `ayvee-runner ${VERSION}
@@ -30,6 +31,15 @@ Usage:
                                  can show how much of it is left.
   ayvee-runner set-url <url>     Externally reachable base URL (behind a proxy),
                                  used when advertising the registration URL.
+  ayvee-runner config code <dir> [--id ID] [--label L] [--tmux]
+                                 [--permission-mode MODE] [--isolate-mcp]
+                                 Add a launch profile for working in <dir>.
+  ayvee-runner config list       Show every launchable profile.
+  ayvee-runner config remove <id>
+                                 Remove one of your profiles.
+
+Conversations use the built-in "conversation" profile — no setup needed. Your
+own profiles.json entries are for specific code sessions.
   ayvee-runner serve [--port N]  Start the runner on 127.0.0.1 (default port 7777).
   ayvee-runner mcp [--url U]     MCP stdio server proxying to a running runner
                                  (default http://127.0.0.1:7777, key from disk).
@@ -133,6 +143,70 @@ function setUrl(args: string[]): void {
   }
 }
 
+function flagValue(args: string[], flag: string): string | undefined {
+  const index = args.indexOf(flag);
+  return index === -1 ? undefined : args[index + 1];
+}
+
+function config(args: string[]): void {
+  const home = runnerHome();
+  const [sub, ...rest] = args;
+
+  if (sub === 'list') {
+    for (const profile of allProfiles(home)) {
+      const origin = profile.builtin ? 'built-in' : 'yours';
+      console.log(`${profile.id}  [${profile.kind}, ${origin}]  ${profile.label}`);
+      console.log(`    cwd: ${profile.cwd}`);
+      console.log(`    cmd: ${profile.command}`);
+    }
+    return;
+  }
+
+  if (sub === 'remove') {
+    const id = rest[0];
+    if (id === undefined) {
+      console.error('usage: ayvee-runner config remove <id>');
+      process.exit(1);
+    }
+    if (!removeProfile(id, home)) {
+      console.error(`no profile of yours with id "${id}" (built-ins cannot be removed)`);
+      process.exit(1);
+    }
+    console.log(`Removed profile "${id}".`);
+    return;
+  }
+
+  if (sub === 'code') {
+    const dir = rest.find((arg) => !arg.startsWith('--'));
+    if (dir === undefined) {
+      console.error('usage: ayvee-runner config code <dir> [--id ID] [--label L] [--tmux]');
+      process.exit(1);
+    }
+    try {
+      const profile = addCodeProfile(
+        dir,
+        {
+          id: flagValue(rest, '--id'),
+          label: flagValue(rest, '--label'),
+          kind: rest.includes('--tmux') ? 'tmux' : 'headless',
+          permissionMode: flagValue(rest, '--permission-mode'),
+          isolateMcp: rest.includes('--isolate-mcp'),
+        },
+        home,
+      );
+      console.log(`Added profile "${profile.id}" (${profile.kind}) for ${profile.cwd}`);
+      console.log(`  ${profile.command}`);
+    } catch (err) {
+      console.error((err as Error).message);
+      process.exit(1);
+    }
+    return;
+  }
+
+  console.error('usage: ayvee-runner config <code|list|remove> …');
+  process.exit(1);
+}
+
 const [cmd, ...rest] = process.argv.slice(2);
 switch (cmd) {
   case 'mint-key':
@@ -146,6 +220,9 @@ switch (cmd) {
     break;
   case 'set-url':
     setUrl(rest);
+    break;
+  case 'config':
+    config(rest);
     break;
   case 'serve':
     serve(rest);

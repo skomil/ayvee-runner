@@ -201,10 +201,23 @@ describe('GET /api/metrics', () => {
 });
 
 describe('GET /api/profiles', () => {
-  it('returns the allowlist', async () => {
+  it('returns the built-in conversation profile plus the user allowlist', async () => {
     const res = await authed(request(app).get('/api/profiles'));
     expect(res.status).toBe(200);
-    expect(res.body.profiles).toEqual(PROFILES.profiles);
+    const builtins = res.body.profiles.filter((p: { builtin?: boolean }) => p.builtin);
+    expect(builtins.map((p: { id: string }) => p.id)).toEqual(['conversation']);
+    expect(res.body.profiles.filter((p: { builtin?: boolean }) => !p.builtin)).toEqual(
+      PROFILES.profiles,
+    );
+  });
+
+  it('can spawn the built-in conversation profile without any profiles.json', async () => {
+    fs.rmSync(profilesPath(home));
+    const res = await authed(request(app).post('/api/sessions')).send({
+      profileId: 'conversation',
+    });
+    expect(res.status).toBe(201);
+    expect(res.body.session.kind).toBe('headless');
   });
 
   it('surfaces a malformed profiles.json as a 500', async () => {

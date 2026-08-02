@@ -7,6 +7,8 @@ export interface LaunchProfile {
   kind: SessionKind;
   cwd: string;
   command: string;
+  /** True for profiles the runner ships; user profiles come from disk. */
+  builtin?: boolean;
 }
 
 export type SessionStatus = 'running' | 'exited';
