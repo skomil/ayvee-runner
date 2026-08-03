@@ -105,11 +105,12 @@ describe('config code', () => {
     expect(profile.cwd).toBe(path.resolve(repo));
   });
 
-  it('writes a headless stream-json command with permissions by default', () => {
+  it('writes a headless stream-json command defaulting to auto permissions', () => {
     const { command, kind } = addCodeProfile(repo, {}, home);
     expect(kind).toBe('headless');
     expect(command).toContain('--input-format=stream-json');
-    expect(command).toContain('--permission-mode acceptEdits');
+    // auto keeps a remotely-driven session from stalling on a prompt.
+    expect(command).toContain('--permission-mode auto');
     // Code sessions keep the repo's own MCP servers unless asked otherwise.
     expect(command).not.toContain('--strict-mcp-config');
   });

@@ -104,7 +104,7 @@ describe('SessionRegistry with tmux sessions', () => {
       'new-session',
       session.tmuxName,
       '/tmp',
-      "claude --remote-control 'my rc session'",
+      "claude --remote-control 'my rc session' --permission-mode auto",
     ]);
   });
 
@@ -113,7 +113,7 @@ describe('SessionRegistry with tmux sessions', () => {
     const reg = new SessionRegistry(tmux);
     await reg.spawn(tmuxProfile, `x'; touch /tmp/pwned; echo '`, { remoteControl: true });
     expect(tmux.calls[0]![3]).toBe(
-      `claude --remote-control 'x'\\''; touch /tmp/pwned; echo '\\'''`,
+      `claude --remote-control 'x'\\''; touch /tmp/pwned; echo '\\''' --permission-mode auto`,
     );
   });
 

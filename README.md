@@ -58,18 +58,33 @@ node dist/cli.js set-limit 2000000
 ```
 
 Stored in `config.json` and read per request, so it applies without a restart. With it set,
-the dashboard leads with **how much of the 5-hour window is left** (e.g. "99% left") over a
-usage meter, and `/api/metrics` returns `remainingTokens` / `remainingPercent`. Without it,
-the runner still reports tokens used — it just can't express them as a percentage.
+the dashboard leads with **how much of the 5-hour window is used** (e.g. "26% used") over a
+usage meter, and `/api/metrics` returns `remainingTokens` / `remainingPercent` alongside the
+used figures. Without it, the runner still reports tokens used — it just can't express them
+as a percentage.
 
 Anthropic doesn't publish plan limits as a token count, so pick a number that matches what
 you observe and adjust it; `AYVEE_RUNNER_5H_TOKEN_LIMIT` overrides the stored value.
 
 ### 4. Declare launch profiles
 
-The runner only ever launches commands from `~/.ayvee-runner/profiles.json` — Ayvee sends a
-profile id, never a command. This allowlist is the security boundary; edit it only on the
-machine itself.
+Conversations need no setup: a built-in **`conversation`** profile always exists, isolated
+from this machine's MCP servers and pre-authorized so tool calls complete unattended.
+
+Everything else comes from `~/.ayvee-runner/profiles.json` — Ayvee sends a profile id, never
+a command. This allowlist is the security boundary; edit it only on the machine itself, or
+let the CLI write it for you:
+
+```sh
+node dist/cli.js config code /repos/foo      # add a code session for that directory
+node dist/cli.js config list                 # built-ins and yours
+node dist/cli.js config remove code-foo
+```
+
+Profiles added this way default to `--permission-mode auto`, since a remotely-driven session
+has nobody at the machine to answer a prompt; pass `--permission-mode <mode>` to change it,
+`--tmux` for an interactive session, or `--isolate-mcp` to cut it off from this machine's MCP
+servers. A profile of yours with the same id as a built-in replaces it. The raw file format:
 
 ```json
 {
@@ -114,6 +129,9 @@ prefix (as usual for relative-path apps).
 | `ayvee-runner set-name <name>` | Set this machine's display name in `config.json`. |
 | `ayvee-runner set-limit <n>` | Set the 5-hour token limit used for the "% left" figure. |
 | `ayvee-runner set-url <url>` | Externally reachable base URL, used when advertising the register URL. |
+| `ayvee-runner config code <dir>` | Add a launch profile for that directory (`--id`, `--label`, `--tmux`, `--permission-mode`, `--isolate-mcp`). Defaults to auto permissions. |
+| `ayvee-runner config list` | Show every launchable profile, built-in and yours. |
+| `ayvee-runner config remove <id>` | Remove one of your profiles. |
 | `ayvee-runner serve [--port N]` | Start the runner on `127.0.0.1` (default port 7777). |
 | `ayvee-runner mcp [--url U]` | Run a stdio MCP server proxying to a running runner (key read from disk). |
 
@@ -184,9 +202,10 @@ Every error body is `{ "error": "<message>" }`.
 - `name` (optional) — display name; defaults to the profile label. Stored verbatim, never
   passed to a shell.
 - `remoteControl` (optional, tmux profiles only) — instead of the profile command, the runner
-  launches `claude --remote-control '<name>'` in the profile's `cwd`, so the session appears
-  as a Remote Control target on claude.ai. The command is built (and shell-quoted) by the
-  runner, never taken from the caller.
+  launches `claude --remote-control '<name>' --permission-mode auto` in the profile's `cwd`,
+  so the session appears as a Remote Control target on claude.ai. Auto is the default because
+  nobody is at the machine to answer a permission prompt — you're driving it from claude.ai.
+  The command is built (and shell-quoted) by the runner, never taken from the caller.
 - `model` (optional) — start the session on a specific Claude model (e.g. `"sonnet"`,
   `"claude-opus-5"`). Exported as `ANTHROPIC_MODEL` in the session's environment, which
   Claude reads at startup — the allowlisted command is never modified, and non-Claude

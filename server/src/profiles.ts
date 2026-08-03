@@ -101,7 +101,8 @@ export function addCodeProfile(
     throw new ProfileExistsError(`profile "${id}" already exists (pass --id to choose another)`);
   }
   const kind = opts.kind ?? 'headless';
-  const permission = `--permission-mode ${opts.permissionMode ?? 'acceptEdits'}`;
+  // Default auto: the session is driven remotely, so prompts would stall it.
+  const permission = `--permission-mode ${opts.permissionMode ?? 'auto'}`;
   const mcp = opts.isolateMcp ? ` ${ISOLATE_MCP}` : '';
   const profile: LaunchProfile = {
     id,

@@ -14,7 +14,9 @@ export class SessionKindError extends Error {}
 
 export interface SpawnOptions {
   /**
-   * Launch `claude --remote-control <session name>` in the profile's cwd
+   * Launch `claude --remote-control <session name> --permission-mode auto`
+   * in the profile's cwd — auto keeps a remotely-driven session moving
+   * instead of stalling on prompts nobody at the machine will answer.
    * instead of the profile command, registering the session with claude.ai.
    * The command is built here — never taken from the caller — so the
    * allowlist stays the boundary for what can run.
@@ -68,7 +70,7 @@ export class SessionRegistry {
     if (profile.kind === 'tmux') {
       info.tmuxName = `ayr-${id.slice(0, 8)}`;
       const command = opts?.remoteControl
-        ? `claude --remote-control ${shellQuote(info.name)}`
+        ? `claude --remote-control ${shellQuote(info.name)} --permission-mode auto`
         : profile.command;
       if (opts?.remoteControl) info.remoteControl = true;
       await this.tmux.newSession(info.tmuxName, profile.cwd, command, env);
