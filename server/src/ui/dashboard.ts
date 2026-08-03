@@ -1,3 +1,5 @@
+import { localResetTime } from './format.js';
+
 interface Profile {
   id: string;
   label: string;
@@ -303,10 +305,10 @@ function renderClaudeLimits(limits: ClaudeLimits | null): boolean {
 
   const session = limits.limits.find((l) => l.scope === 'session') ?? limits.limits[0]!;
   const headline = $('#limit-headline');
-  setReadout(headline, `${session.remainingPercent}%`, 'left');
+  setReadout(headline, `${session.usedPercent}%`, 'used');
   headline.hidden = false;
   $('#limit-line').textContent =
-    `${session.label}: ${session.usedPercent}% used · resets ${session.resetsAt}`;
+    `${session.label}: ${session.remainingPercent}% left · resets ${localResetTime(session.resetsAt)}`;
   $('#limit-meter').hidden = true; // each row carries its own meter below
 
   for (const limit of limits.limits) {
@@ -318,7 +320,8 @@ function renderClaudeLimits(limits: ClaudeLimits | null): boolean {
     const detail = document.createElement('span');
     detail.className = 'limit-detail';
     detail.textContent =
-      `${limit.remainingPercent}% left · ${limit.usedPercent}% used · resets ${limit.resetsAt}`;
+      `${limit.usedPercent}% used · ${limit.remainingPercent}% left · ` +
+      `resets ${localResetTime(limit.resetsAt)}`;
     row.append(label, barFor(limit.usedPercent), detail);
     list.appendChild(row);
   }
@@ -386,12 +389,12 @@ async function refreshMetrics(): Promise<void> {
   const bar = $('#limit-bar');
 
   if (tokens !== null && remainingPercent !== null && remainingTokens !== null) {
-    setReadout(headline, `${remainingPercent}%`, 'left');
+    setReadout(headline, `${usedPercent}%`, 'used');
     headline.hidden = false;
     limitLine.textContent =
-      `${remainingTokens.toLocaleString()} of ${tokens.toLocaleString()} tokens left in the ` +
-      `${claude.windowHours}-hour window — ${claude.window.total.toLocaleString()} used ` +
-      `(${usedPercent}%).`;
+      `${claude.window.total.toLocaleString()} of ${tokens.toLocaleString()} tokens used in the ` +
+      `${claude.windowHours}-hour window — ${remainingTokens.toLocaleString()} left ` +
+      `(${remainingPercent}%).`;
     bar.style.width = `${Math.min(100, usedPercent ?? 0)}%`;
     // Green while there's headroom, amber past 75%, red past 90% used.
     bar.className = (usedPercent ?? 0) >= 90 ? 'bar danger' : (usedPercent ?? 0) >= 75 ? 'bar warn' : 'bar';
