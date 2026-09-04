@@ -94,6 +94,9 @@ class Session:
     name: str
     created_at: str
     status: str
+    #: Headless sessions only: when the session last emitted an event or was
+    #: sent input. ``None`` for tmux sessions, which have no event stream.
+    last_activity_at: str | None = None
     tmux_name: str | None = None
     remote_control: bool = False
     model: str | None = None
@@ -112,6 +115,7 @@ class Session:
             name=data["name"],
             created_at=data["createdAt"],
             status=data["status"],
+            last_activity_at=data.get("lastActivityAt"),
             tmux_name=data.get("tmuxName"),
             remote_control=data.get("remoteControl", False),
             model=data.get("model"),
