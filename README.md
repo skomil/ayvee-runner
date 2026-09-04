@@ -231,8 +231,14 @@ A session object looks like:
   exited.
 - tmux sessions carry `tmuxName` (attach with `tmux attach -t <tmuxName>`); headless
   sessions carry `exitCode` once the process ends.
+- Headless sessions carry `lastActivityAt` — when the session last emitted an event or was
+  sent input, seeded at spawn. tmux sessions have no event stream to observe, so they carry
+  no value.
 - The registry is **in-memory**: sessions do not survive a runner restart, and a graceful
   shutdown (SIGINT/SIGTERM) kills every session it owns.
+- **Maintenance sweep**: every 30 minutes the runner kills headless sessions whose
+  `lastActivityAt` is more than 6 hours old, and logs each one it reaps. tmux sessions are
+  never reaped — they are interactive, and a human may be attached to a quiet one.
 
 ### Headless input & events
 

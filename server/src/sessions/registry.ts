@@ -101,6 +101,7 @@ export class SessionRegistry {
       }
     } else {
       const proc = rec.headless!;
+      rec.info.lastActivityAt = proc.lastActivityAt;
       if (proc.exited) {
         rec.info.status = 'exited';
         rec.info.exitCode = proc.exitCode;

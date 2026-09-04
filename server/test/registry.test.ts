@@ -227,6 +227,27 @@ describe('SessionRegistry with headless sessions', () => {
     expect(events[0]!.data).toEqual({ raw: 'model=sonnet' });
   });
 
+  it('tracks lastActivityAt, seeded at spawn and advanced by each event', async () => {
+    reg = new SessionRegistry(new FakeTmuxDriver());
+    const session = await reg.spawn(headlessProfile);
+    expect(session.lastActivityAt).toBeDefined();
+    expect(Date.parse(session.lastActivityAt!)).toBeGreaterThanOrEqual(Date.parse(session.createdAt));
+
+    reg.sendInput(session.id, 'hello runner');
+    const events = await eventually(
+      () => reg.eventsSince(session.id, 0),
+      (evs: SessionEvent[]) => evs.length > 0,
+    );
+    const info = await reg.get(session.id);
+    expect(info.lastActivityAt).toBe(events[events.length - 1]!.ts);
+  });
+
+  it('leaves lastActivityAt unset for tmux sessions', async () => {
+    reg = new SessionRegistry(new FakeTmuxDriver());
+    const session = await reg.spawn(tmuxProfile);
+    expect(session.lastActivityAt).toBeUndefined();
+  });
+
   it('keeps non-JSON output lines as raw events', async () => {
     reg = new SessionRegistry(new FakeTmuxDriver());
     const session = await reg.spawn({ ...headlessProfile, command: 'echo not-json' });

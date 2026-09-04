@@ -15,6 +15,8 @@ export class HeadlessProcess {
   exited = false;
   private events: SessionEvent[] = [];
   private nextSeq = 1;
+  /** Last time the process emitted an event or was sent input. */
+  lastActivityAt = new Date().toISOString();
   private stdoutBuf = '';
   private stderrChunks: string[] = [];
 
@@ -69,7 +71,9 @@ export class HeadlessProcess {
     } catch {
       data = { raw: line };
     }
-    this.events.push({ seq: this.nextSeq++, ts: new Date().toISOString(), data });
+    const ts = new Date().toISOString();
+    this.lastActivityAt = ts;
+    this.events.push({ seq: this.nextSeq++, ts, data });
     const usage = usageFromEvent(data);
     if (usage && this.onUsage) this.onUsage(usage);
     if (this.events.length > MAX_EVENTS) {
@@ -87,6 +91,8 @@ export class HeadlessProcess {
       message: { role: 'user', content: [{ type: 'text', text }] },
     });
     this.child.stdin.write(`${line}\n`);
+    // A session that was just given work is not idle, even before it replies.
+    this.lastActivityAt = new Date().toISOString();
   }
 
   /** Recent stderr output, for diagnosing a failed or crashing launch. */

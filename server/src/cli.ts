@@ -20,6 +20,7 @@ import {
 import { createMcpServer } from './mcp.js';
 import { addCodeProfile, allProfiles, removeProfile } from './profiles.js';
 import { SessionRegistry } from './sessions/registry.js';
+import { MAX_IDLE_MS, REAP_INTERVAL_MS, startReaper } from './sessions/reaper.js';
 
 const USAGE = `ayvee-runner ${VERSION}
 
@@ -82,9 +83,21 @@ function serve(args: string[]): void {
     const base = readPublicUrl(home) ?? `http://127.0.0.1:${port}/`;
     console.log(`runner id: ${readRunnerId(home)}`);
     console.log(`register at: ${new URL('api/register', base).toString()}`);
+    console.log(
+      `maintenance: reaping idle headless sessions every ${REAP_INTERVAL_MS / 60_000}m (idle > ${MAX_IDLE_MS / 3_600_000}h)`,
+    );
+  });
+
+  const stopReaper = startReaper(registry, {
+    onReap: (reaped) => {
+      for (const s of reaped) {
+        console.log(`reaped idle headless session ${s.id} ("${s.name}", idle since ${s.lastActivityAt})`);
+      }
+    },
   });
 
   const shutdown = async () => {
+    stopReaper();
     await registry.shutdown();
     server.close(() => process.exit(0));
   };

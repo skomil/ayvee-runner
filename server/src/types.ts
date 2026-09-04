@@ -19,6 +19,13 @@ export interface SessionInfo {
   kind: SessionKind;
   name: string;
   createdAt: string;
+  /**
+   * headless sessions only: when the session last did anything — emitted an
+   * event or was sent input — falling back to createdAt. Makes "how idle is
+   * this session?" a single call. tmux sessions have no event stream to
+   * observe, so they carry no value.
+   */
+  lastActivityAt?: string;
   status: SessionStatus;
   /** tmux sessions only: the tmux session name for `tmux attach`. */
   tmuxName?: string;
